@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User & Admin Roles
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(EDITOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+// Category of products/decor
+model Category {
+  id          String    @id @default(uuid())
+  name        String    // e.g., بديل الرخام, دهانات داخلية
+  slug        String    @unique
+  description String?   @db.Text
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Decor/Paint Project (The Main Entity)
+model Project {
+  id              String         @id @default(uuid())
+  title           String
+  slug            String         @unique
+  description     String         @db.Text
+  category        Category       @relation(fields: [categoryId], references: [id])
+  categoryId      String
+  mainImage       String         // Main High-Res Image URL (WebP)
+  gallery         ProjectImage[]
+  features        Json?          // Key features of the project
+  metaTitle       String?        // SEO
+  metaDescription String?        // SEO
+  views           Int            @default(0) // Internal tracking of views
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model ProjectImage {
+  id        String   @id @default(uuid())
+  url       String
+  altText   String   // SEO for images
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  order     Int      @default(0) // Order in gallery
+}
+
+// Tracking Analytics
+model VisitEvent {
+  id        String   @id @default(uuid())
+  ipHash    String?
+  source    String?  // organic, cpc, referral
+  pageUrl   String
+  eventName String   // page_view, contact_click
+  createdAt DateTime @default(now())
+}
+
+// Leads / Contact Form Submissions
+model QuoteRequest {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  service   String
+  details   String?  @db.Text
+  status    LeadStatus @default(NEW)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
