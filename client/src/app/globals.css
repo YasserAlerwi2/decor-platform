@@ -1,75 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-primary-fixed: #ae8dff;
+  --color-on-background: #dee5ff;
+  --color-secondary-fixed: #6bff8f;
+  --color-surface-container-low: #091328;
+  --color-background: #060e20;
+  --color-surface-tint: #ba9eff;
+  --color-inverse-on-surface: #4d556b;
+  --color-inverse-primary: #6e3bd7;
+  --color-surface-container-high: #141f38;
+  --color-error: #ff6e84;
+  --color-secondary-container: #006e2f;
+  --color-on-primary-container: #2b006e;
+  --color-primary-fixed-dim: #a27cff;
+  --color-primary-container: #ae8dff;
+  --color-on-error: #490013;
+  --color-on-secondary: #005f28;
+  --color-primary: #ba9eff;
+  --color-surface-container-highest: #192540;
+  --color-on-surface-variant: #a3aac4;
+  --color-secondary: #6bff8f;
+  --color-on-tertiary-fixed: #360021;
+  --color-surface-variant: #192540;
+  --color-secondary-fixed-dim: #5bf083;
+  --color-error-container: #a70138;
+  --color-primary-dim: #8455ef;
+  --color-on-surface: #dee5ff;
+  --color-outline: #6d758c;
+  --color-error-dim: #d73357;
+  --color-tertiary: #ff86c3;
+  --color-on-primary: #39008c;
+  --color-surface-container: #0f1930;
+  --color-surface-dim: #060e20;
+  --color-secondary-dim: #5bf083;
+  --color-surface-bright: #1f2b49;
+  --color-on-tertiary-fixed-variant: #73004b;
+  --color-tertiary-dim: #f271b5;
+  --color-on-tertiary-container: #4a002f;
+  --color-surface-container-lowest: #000000;
+  --color-on-secondary-fixed-variant: #006a2d;
+  --color-outline-variant: #40485d;
+  --color-tertiary-fixed: #ff8bc5;
+  --color-tertiary-container: #f673b7;
+  --color-on-secondary-fixed: #004a1d;
+  --color-inverse-surface: #faf8ff;
+  --color-on-tertiary: #5f003e;
+  --color-on-primary-fixed-variant: #370086;
+  --color-surface: #060e20;
+  --color-on-error-container: #ffb2b9;
+  --color-tertiary-fixed-dim: #f976ba;
+  --color-on-secondary-container: #e4ffe2;
+  --color-on-primary-fixed: #000000;
+
+  --font-headline: "Readex Pro", sans-serif;
+  --font-body: "Readex Pro", sans-serif;
+  --font-label: "Readex Pro", sans-serif;
+}
 
 html {
   scroll-behavior: smooth;
 }
 
+*:not(.material-symbols-outlined) {
+  font-family: "Readex Pro", sans-serif !important;
+  font-optical-sizing: auto;
+  font-variation-settings: "HEXP" 0;
+}
+
 body {
-  background-color: #050508;
-  color: #ffffff;
-  overflow-x: hidden;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  min-height: max(100vh, 884px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bg-hero-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(132, 85, 239, 0.15) 0%, rgba(6, 14, 32, 1) 70%);
+}
+
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-/* Remove default link styling */
-a {
-  text-decoration: none !important;
-}
-
-/* Center utility */
-.centered-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-@theme inline {
-  --color-background: #050508;
-  --color-foreground: #ffffff;
-}
-
-/* ===== CSS Animations (replaces Framer Motion — always works with bfcache) ===== */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes bounceSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.8s ease-out both;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 1s ease-out both;
-}
-
-.animate-bounce-slow {
-  animation: bounceSlow 2s ease-in-out infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}

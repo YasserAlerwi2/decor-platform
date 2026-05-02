@@ -1,0 +1,243 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================================================
+// 1. مستخدمو لوحة التحكم
+// ================================================================
+model AdminUser {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  fullName     String?  @map("full_name") @db.VarChar(100)
+  role         AdminRole @default(admin)
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+enum AdminRole {
+  super_admin
+  admin
+}
+
+// ================================================================
+// 2. إعدادات الموقع العامة
+// ================================================================
+model SiteSettings {
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  siteName         String   @default("العروي للديكورات") @map("site_name") @db.VarChar(100)
+  logoUrl          String?  @map("logo_url") @db.Text
+  phone            String?  @db.VarChar(20)
+  whatsappUrl      String?  @map("whatsapp_url") @db.Text
+  address          String?  @db.VarChar(255)
+  yearsExperience  Int      @default(7) @map("years_experience") @db.UnsignedTinyInt
+  totalProjects    Int      @default(1200) @map("total_projects") @db.UnsignedSmallInt
+  satisfactionRate Int      @default(98) @map("satisfaction_rate") @db.UnsignedTinyInt
+  instagramUrl     String?  @map("instagram_url") @db.VarChar(255)
+  tiktokUrl        String?  @map("tiktok_url") @db.VarChar(255)
+  snapchatUrl      String?  @map("snapchat_url") @db.VarChar(255)
+
+  // Hero Section Content
+  heroTitle        String?  @map("hero_title") @db.VarChar(255)
+  heroSubtitle     String?  @map("hero_subtitle") @db.VarChar(255)
+  heroDescription  String?  @map("hero_description") @db.Text
+  heroImageUrl     String?  @map("hero_image_url") @db.Text
+
+  // Services Section Content
+  servicesLabel    String?  @map("services_label") @db.VarChar(100)
+  servicesTitle    String?  @map("services_title") @db.VarChar(255)
+  servicesDescription String? @map("services_description") @db.Text
+
+  // Footer Content
+  footerHeading    String?  @map("footer_heading") @db.VarChar(255)
+  footerDescription String?  @map("footer_description") @db.Text
+  footerCtaText    String?  @map("footer_cta_text") @db.VarChar(255)
+
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  seo              SiteSeo?
+  analytics        AnalyticsIntegrations?
+
+  @@map("site_settings")
+}
+
+// ================================================================
+// 3. إعدادات SEO العامة للموقع
+// ================================================================
+model SiteSeo {
+  id             Int           @id @default(autoincrement()) @db.UnsignedInt
+  siteSettingsId Int           @unique @map("site_settings_id") @db.UnsignedInt
+  siteSettings   SiteSettings  @relation(fields: [siteSettingsId], references: [id])
+
+  metaTitle       String?  @map("meta_title") @db.VarChar(60)
+  metaDescription String?  @map("meta_description") @db.VarChar(160)
+  metaKeywords    String?  @map("meta_keywords") @db.Text
+  ogTitle         String?  @map("og_title") @db.VarChar(60)
+  ogDescription   String?  @map("og_description") @db.VarChar(200)
+  ogImageUrl      String?  @map("og_image_url") @db.Text
+  canonicalUrl    String?  @map("canonical_url") @db.VarChar(255)
+  robotsDirective String   @default("index, follow") @map("robots_directive") @db.VarChar(50)
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("site_seo")
+}
+
+// ================================================================
+// 4. إعدادات تتبع وتحليل الزيارات
+// ================================================================
+model AnalyticsIntegrations {
+  id               Int           @id @default(autoincrement()) @db.UnsignedInt
+  siteSettingsId   Int           @unique @map("site_settings_id") @db.UnsignedInt
+  siteSettings     SiteSettings  @relation(fields: [siteSettingsId], references: [id])
+
+  googleAnalyticsId String?  @map("google_analytics_id") @db.VarChar(30)
+  googleAdsTag      String?  @map("google_ads_tag") @db.VarChar(30)
+  searchConsoleCode String?  @map("search_console_code") @db.VarChar(255)
+  metaPixelId       String?  @map("meta_pixel_id") @db.VarChar(30)
+  snapPixelId       String?  @map("snap_pixel_id") @db.VarChar(30)
+  headerScripts     String?  @map("header_scripts") @db.Text
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("analytics_integrations")
+}
+
+// ================================================================
+// 5. الفئات
+// ================================================================
+model Category {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(100)
+  description String?  @db.Text
+  imageUrl    String?  @map("image_url") @db.Text
+  sortOrder   Int      @default(0) @map("sort_order") @db.UnsignedTinyInt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  services    Service[]
+  images      GalleryImage[] @relation("ImageCategories")
+
+  @@map("categories")
+}
+
+// ================================================================
+// 6. الخدمات
+// ================================================================
+model Service {
+  id           Int           @id @default(autoincrement()) @db.UnsignedInt
+  name         String        @db.VarChar(100)
+  slug         String        @unique @db.VarChar(100)
+  description  String?       @db.Text
+  heroImageUrl String?       @map("hero_image_url") @db.Text
+  status       ServiceStatus @default(draft)
+  sortOrder    Int           @default(0) @map("sort_order") @db.UnsignedTinyInt
+  categoryId   Int?          @map("category_id") @db.UnsignedInt
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  seo          ServiceSeo?
+  images       GalleryImage[]
+
+  @@map("services")
+}
+
+enum ServiceStatus {
+  published
+  draft
+}
+
+// ================================================================
+// 7. SEO الخدمات (الأهم لمحركات البحث)
+// ================================================================
+model ServiceSeo {
+  id             Int      @id @default(autoincrement()) @db.UnsignedInt
+  serviceId      Int      @unique @map("service_id") @db.UnsignedInt
+  service        Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  metaTitle      String?  @map("meta_title") @db.VarChar(60)
+  metaDescription String? @map("meta_description") @db.VarChar(160)
+  keywords       String?  @db.Text
+  ogTitle        String?  @map("og_title") @db.VarChar(60)
+  ogDescription  String?  @map("og_description") @db.VarChar(200)
+  imageAltText   String?  @map("image_alt_text") @db.VarChar(255)
+  imageTitleTag  String?  @map("image_title_tag") @db.VarChar(255)
+  schemaType     String   @default("Service") @map("schema_type") @db.VarChar(50)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("service_seo")
+}
+
+// ================================================================
+// 7. صور المعرض
+// ================================================================
+model GalleryImage {
+  id         Int        @id @default(autoincrement()) @db.UnsignedInt
+  serviceId  Int?       @map("service_id") @db.UnsignedInt
+  service    Service?   @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  imageUrl   String     @map("image_url") @db.Text
+  title      String?    @db.VarChar(150)
+  sortOrder  Int        @default(0) @map("sort_order") @db.UnsignedInt
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  categories Category[] @relation("ImageCategories")
+  seo        ImageSeo?
+
+  @@map("gallery_images")
+}
+
+// ================================================================
+// 9. SEO صور المعرض
+// ================================================================
+model ImageSeo {
+  id        Int          @id @default(autoincrement()) @db.UnsignedInt
+  imageId   Int          @unique @map("image_id") @db.UnsignedInt
+  image     GalleryImage @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  altText   String   @default("") @map("alt_text") @db.VarChar(255)
+  titleTag  String?  @map("title_tag") @db.VarChar(255)
+  caption   String?  @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("image_seo")
+}
+
+// ================================================================
+// 10. نقرات التواصل (واتساب / اتصال)
+// ================================================================
+model ContactClick {
+  id          Int         @id @default(autoincrement()) @db.UnsignedInt
+  clickType   ClickType   @map("click_type")
+  sourcePage  String?     @map("source_page") @db.VarChar(255)
+  sourceLabel String?     @map("source_label") @db.VarChar(100)
+  deviceType  DeviceType? @default(mobile) @map("device_type")
+  referrer    String?     @db.VarChar(500)
+  clickedAt   DateTime    @default(now()) @map("clicked_at")
+
+  @@index([clickType])
+  @@index([clickedAt])
+  @@map("contact_clicks")
+}
+
+enum ClickType {
+  whatsapp
+  phone
+}
+
+enum DeviceType {
+  mobile
+  tablet
+  desktop
+}

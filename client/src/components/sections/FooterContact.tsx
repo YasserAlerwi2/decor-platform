@@ -1,8 +1,9 @@
 'use client';
 
-
 import { Phone, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { trackClick } from '@/lib/trackClick';
 
 const WhatsappIcon = ({ size = 24, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -11,6 +12,23 @@ const WhatsappIcon = ({ size = 24, className = "" }) => (
 );
 
 export default function FooterContact() {
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/site-data')
+      .then(res => res.json())
+      .then(data => { if (data.settings) setSettings(data.settings); })
+      .catch(() => {});
+  }, []);
+
+  const footerHeading = settings?.footerHeading || 'جاهزون لتحويل\nمساحتك إلى تحفة فنية';
+  const footerDesc = settings?.footerDescription || 'تواصل معنا الآن عبر واتساب أو اتصل مباشرة واحصل على استشارة مجانية لمشروعك';
+  const footerCta = settings?.footerCtaText || 'تواصل معنا الآن عبر واتساب أو اتصل مباشرة واحصل على استشارة مجانية لمشروعك';
+  const whatsappLink = settings?.whatsappUrl || 'https://wa.me/966506027658';
+  const phoneLink = settings?.phone ? `tel:${settings.phone}` : 'tel:+966506027658';
+  const phoneDisplay = settings?.phone ? `+${settings.phone.replace(/^(966)/, '966 ')}` : '+966 50 602 7658';
+  const address = settings?.address || 'محايل عسير';
+
   return (
     <section id="contact" className="relative z-10 pt-12 md:pt-36 pb-6 md:pb-8 w-full flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl mb-8 md:mb-24 flex flex-col items-center text-center bg-white/[0.02] backdrop-blur-2xl border-y md:border border-white/[0.05] md:rounded-[4rem] p-5 py-10 md:p-20 shadow-[0_0_80px_rgba(0,0,0,0.5)]">
@@ -25,22 +43,23 @@ export default function FooterContact() {
 
           {/* Heading */}
           <h2 className="text-lg md:text-4xl font-black text-white leading-[1.6] md:leading-[1.7] mb-6">
-            جاهزون لتحويل
-            <br />
-            مساحتك إلى تحفة فنية
+            {footerHeading.split('\n').map((line: string, i: number) => (
+              <span key={i}>{line}{i < footerHeading.split('\n').length - 1 && <br />}</span>
+            ))}
           </h2>
 
           {/* Description */}
           <p className="text-white/60 text-xs md:text-xl font-medium max-w-2xl text-center mb-6 md:mb-16">
-            تواصل معنا الآن عبر واتساب أو اتصل مباشرة واحصل على استشارة مجانية لمشروعك
+            {footerDesc}
           </p>
 
           {/* Buttons */}
           <div className="flex flex-row items-center justify-center gap-2 md:gap-6 w-full mb-16 px-1 md:px-0">
             {/* WhatsApp */}
             <Link
-              href="https://wa.me/966506027658"
+              href={whatsappLink}
               target="_blank"
+              onClick={() => trackClick('whatsapp', 'Footer WhatsApp')}
               className="group flex flex-row items-center justify-center gap-1.5 md:gap-3 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs md:text-lg px-3 py-3 md:px-10 md:py-5 rounded-xl md:rounded-3xl transition-all duration-300 shadow-[0_0_30px_rgba(37,211,102,0.2)] hover:shadow-[0_0_50px_rgba(37,211,102,0.5)] w-full sm:w-auto whitespace-nowrap"
             >
               <WhatsappIcon size={18} className="group-hover:scale-110 transition-transform md:w-[24px] md:h-[24px]" />
@@ -49,11 +68,12 @@ export default function FooterContact() {
 
             {/* Phone */}
             <Link
-              href="tel:+966506027658"
+              href={phoneLink}
+              onClick={() => trackClick('phone', 'Footer Phone')}
               className="group flex flex-row items-center justify-center gap-1.5 md:gap-3 border border-white/10 hover:border-white/30 bg-white/5 hover:bg-white/10 text-white font-bold text-xs md:text-lg px-3 py-3 md:px-10 md:py-5 rounded-xl md:rounded-3xl transition-all duration-300 w-full sm:w-auto whitespace-nowrap"
             >
               <Phone size={16} className="text-white/50 group-hover:text-white transition-colors md:w-[22px] md:h-[22px]" />
-              <span dir="ltr">+966 50 602 7658</span>
+              <span dir="ltr">{phoneDisplay}</span>
             </Link>
           </div>
 
@@ -82,7 +102,7 @@ export default function FooterContact() {
             {/* Address */}
             <div className="flex items-center gap-1.5 text-white/50 text-xs md:text-sm font-medium mt-2">
               <MapPin size={16} className="text-violet-400" />
-              محايل عسير
+              {address}
             </div>
           </div>
 
