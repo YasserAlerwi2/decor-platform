@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import BfcacheFix from '../components/ui/BfcacheFix';
+import MobileViewport from '../components/ui/MobileViewport';
 import ConditionalLayout from '../components/layout/ConditionalLayout';
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
       </head>
       <body className={`bg-background text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container`}>
         <BfcacheFix />
+        <MobileViewport />
         <ConditionalLayout>
           {children}
         </ConditionalLayout>

@@ -63,12 +63,6 @@ html {
   scroll-behavior: smooth;
 }
 
-@media (max-width: 768px) {
-  html {
-    zoom: 0.8;
-  }
-}
-
 *:not(.material-symbols-outlined) {
   font-family: "Readex Pro", sans-serif !important;
   font-optical-sizing: auto;
