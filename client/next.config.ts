@@ -14,7 +14,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'plus.unsplash.com',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'salahdecor.net',
+      },
+      {
+        protocol: 'http',
+        hostname: 'salahdecor.net',
+      },
     ],
   },
 };

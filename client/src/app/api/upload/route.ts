@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { prisma } from '@/lib/prisma';
+
+const UPLOAD_PROXY_URL = process.env.UPLOAD_PROXY_URL || '';
 
 // Helper function to generate SEO-friendly filename
 function generateSeoFilename(serviceName: string, siteName: string): string {
@@ -24,6 +26,18 @@ function generateSeoFilename(serviceName: string, siteName: string): string {
 // POST /api/upload - Upload and compress image to WebP
 export async function POST(req: NextRequest) {
   try {
+    // If UPLOAD_PROXY_URL is set (Vercel), forward to Hostinger
+    if (UPLOAD_PROXY_URL) {
+      const formData = await req.formData();
+      const proxyRes = await fetch(`${UPLOAD_PROXY_URL}/api/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await proxyRes.json();
+      return NextResponse.json(data, { status: proxyRes.status });
+    }
+
+    // Local upload (Hostinger)
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const folder = formData.get('folder') as string || 'general';
@@ -106,6 +120,16 @@ export async function POST(req: NextRequest) {
 // DELETE /api/upload - Delete image
 export async function DELETE(req: NextRequest) {
   try {
+    // If UPLOAD_PROXY_URL is set (Vercel), forward to Hostinger
+    if (UPLOAD_PROXY_URL) {
+      const proxyRes = await fetch(`${UPLOAD_PROXY_URL}/api/upload?url=${encodeURIComponent(new URL(req.url).searchParams.get('url') || '')}`, {
+        method: 'DELETE',
+      });
+      const data = await proxyRes.json();
+      return NextResponse.json(data, { status: proxyRes.status });
+    }
+
+    // Local delete (Hostinger)
     const { searchParams } = new URL(req.url);
     const imageUrl = searchParams.get('url');
 
