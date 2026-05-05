@@ -25,6 +25,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    const uploadProxy = process.env.UPLOAD_PROXY_URL || '';
+    if (uploadProxy) {
+      return [
+        {
+          source: '/uploads/:path*',
+          destination: `${uploadProxy}/uploads/:path*`,
+        },
+      ];
+    }
+    return [];
+  },
 };
 
 export default nextConfig;
