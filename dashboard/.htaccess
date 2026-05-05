@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# توجيه /api/auth/login إلى login.php
+RewriteRule ^api/auth/login$ api/auth/login.php [L]
+
+# توجيه /api/admin/* إلى index.php مع path parameter
+RewriteRule ^api/admin/(.*)$ api/admin/index.php?path=$1 [L,QSA]
+
+# منع الوصول المباشر لملفات PHP الداخلية
+RewriteCond %{THE_REQUEST} \s/config\.php [NC]
+RewriteRule ^ - [F,L]
+
+# السماح بعرض ملفات uploads
+RewriteRule ^uploads/ - [L]
+
+# توجيه كل شيء آخر إلى index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [L,QSA]
