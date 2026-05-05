@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'salahdecor.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'dash.salahdecor.net',
+      },
     ],
   },
   async rewrites() {
